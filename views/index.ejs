@@ -1,0 +1,28 @@
+<% include partials/header.ejs %>
+<h1>HELLO EJS IS WORKING</h1>
+<hr>
+<h3>
+    <%= title %>
+</h3>
+<br>
+<table class="table table-striped">
+    <tr>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Email</th>
+    </tr>
+    <% users.forEach(function(user){%>
+    <tr>
+        <td>
+            <%= user.first_name %>
+        </td>
+        <td>
+            <%= user.last_name %>
+        </td>
+        <td>
+            <%= user.email %>
+        </td>
+    </tr>
+    <%}) %>
+</table>
+<% include partials/footer.ejs %>

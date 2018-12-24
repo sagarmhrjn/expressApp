@@ -7,7 +7,7 @@ var path = require('path');
 
 var app = express();
 
-/* Testing for json */
+// /* Static user info
 var users = [
     {
         first_name: 'Sagar',
@@ -15,11 +15,26 @@ var users = [
         email: 'sagarmaharjan31@gmail.com'
     },
     {
+        first_name: 'Jenish',
+        last_name: 'Maharjan',
+        email: 'jensmaharjan331@gmail.com'
+    },
+    {
         first_name: 'Rikee',
         last_name: 'Maharjan',
-        email: 'rikee312@gmail.com'
+        email: 'rikeemaharjan231@gmail.com'
+    },
+    {
+        first_name: 'Azay',
+        last_name: 'Maharjan',
+        email: 'ajitmaharjan3161@gmail.com'
     },
 ]
+
+/* Middleware for template/view engine */
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 /* Middleware for body-parser */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,7 +45,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Using app.get because we wanna handle the get request
 app.get('/', function (req, res) {
     // res.send('Hello World');
-    res.json(users);
+    // res.json(users);
+    res.render('index', {
+        title: 'Employees',
+        users: users
+    });
 });
 
 // To run our application we need to listen to a port
