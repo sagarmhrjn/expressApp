@@ -2,22 +2,35 @@
 
 /* Require any module or file that we wanna use*/
 var express = require('express');
+var bodyParser = require('body-parser');
+var path = require('path');
 
 var app = express();
 
-/* So basically middleware is a function executed in the middle after the incoming request then produces an output which could be the final output passed or could be used by the next middleware until the cycle is completed, meaning we can have more than one middleware and they will execute in the order they are declared. */
+/* Testing for json */
+var users = [
+    {
+        first_name: 'Sagar',
+        last_name: 'Maharjan',
+        email: 'sagarmaharjan31@gmail.com'
+    },
+    {
+        first_name: 'Rikee',
+        last_name: 'Maharjan',
+        email: 'rikee312@gmail.com'
+    },
+]
+/* Middleware for body-parser */
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-/* Checking Middleware */
-var logger = function (req, res, next) {
-    console.log("Middleware is working...")
-    next();
-};
-// To use our middleware
-app.use(logger);
+/* Middleware for public/static folder */
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Using app.get because we wanna handle the get request
 app.get('/', function (req, res) {
-    res.send('Hello World');
+    // res.send('Hello World');
+    res.json(users);
 });
 
 // To run our application we need to listen to a port
