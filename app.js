@@ -6,31 +6,13 @@ var bodyParser = require('body-parser');
 var path = require('path');
 var expressValidator = require('express-validator');
 
+/* Database: mongojs module */
+var mongojs = require('mongojs');
+var db = mongojs('myClients', ['users']);
+var ObjectId = mongojs.ObjectId;
+
 var app = express();
 
-/* Static user info */
-var users = [
-    {
-        first_name: 'Sagar',
-        last_name: 'Maharjan',
-        email: 'sagarmaharjan31@gmail.com'
-    },
-    {
-        first_name: 'Jenish',
-        last_name: 'Maharjan',
-        email: 'jensmaharjan331@gmail.com'
-    },
-    {
-        first_name: 'Rikee',
-        last_name: 'Maharjan',
-        email: 'rikeemaharjan231@gmail.com'
-    },
-    {
-        first_name: 'Azay',
-        last_name: 'Maharjan',
-        email: 'ajitmaharjan3161@gmail.com'
-    },
-]
 
 /* Middleware for template/view engine */
 app.set('view engine', 'ejs');
@@ -52,17 +34,19 @@ app.use(function (req, res, next) {
 /* Middleware for express-validator */
 app.use(expressValidator());
 
-/* Using app.get because we wanna handle the get request */
+/* GET request: home route */
 app.get('/', function (req, res) {
-    // res.send('Hello World');
-    // res.json(users);
-    res.render('index', {
-        title: 'Employees',
-        users: users
+    // find everything
+    db.users.find(function (err, docs) {
+        // docs is an array of all the documents in mycollection
+        res.render('index', {
+            title: 'Clients',
+            users: docs
+        });
     });
 });
 
-/* Using app.post because we wanna handle the post request */
+/* POST request: Add client route */
 app.post('/users/add', function (req, res) {
     // console.log(req.body.first_name);
     // Setting rules for a field
@@ -74,11 +58,12 @@ app.post('/users/add', function (req, res) {
     var errors = req.validationErrors();
 
     if (errors) {
-        console.log('ERRORS!');
-        res.render('index', {
-            title: 'Employees',
-            users: users,
-            errors: errors
+        db.users.find(function (err, users) {
+            res.render('index', {
+                title: 'Clients',
+                users: users,
+                errors: errors
+            });
         });
     } else {
         var newUser = {
@@ -86,8 +71,81 @@ app.post('/users/add', function (req, res) {
             last_name: req.body.last_name,
             email: req.body.email
         }
-        console.log(newUser);
+        db.users.insert(newUser, function (err, result) {
+            if (err) {
+                console.log(err);
+            }
+            res.redirect('/')
+        });
     }
+});
+
+/* GET request for edit route */
+app.get('/user/edit/:id', function (req, res) {
+    db.users.findOne({ _id: ObjectId(req.params.id) }, function (err, user) {
+        // console.log(user);
+        if (err) {
+            console.log(err);
+        }
+        res.render('edit_users', {
+            title: 'Edit a client',
+            user: user
+        });
+    });
+});
+
+/* POST request for edit route */
+app.post('/user/edit/:id', function (req, res) {
+    // console.log('Submitted');
+    // console.log(req.body.first_name);
+    // return;
+
+    let user = {};
+    user.first_name = req.body.first_name;
+    user.last_name = req.body.last_name;
+    user.email = req.body.email;
+    // console.log(user);
+
+    let query = { _id: ObjectId(req.params.id) }  // where _id matches req.params.id
+    // console.log(query);
+
+    // Setting rules for a field
+    req.checkBody('first_name', 'First name is required').notEmpty();
+    req.checkBody('last_name', 'Last name is required').notEmpty();
+    req.checkBody('email', 'Email is required').notEmpty();
+
+    // Validation Errors
+    var errors = req.validationErrors();
+
+    if (errors) {
+        db.users.findOne({ _id: ObjectId(req.params.id) }, function (err, user) {
+            res.render('edit_users', {
+                title: 'Edit a client',
+                user: user,
+                errors: errors
+            });
+        });
+    } else {
+        db.users.update(query, user, function (err) {
+            if (err) {
+                console.log(err);
+                return;
+            } else {
+                res.redirect('/');
+            }
+        });
+    }
+});
+
+/* DELETE route */
+app.delete('/users/delete/:id', function (req, res) {
+    console.log(req.params.id);
+    db.users.remove({ _id: ObjectId(req.params.id) }, function (err, result) {
+        if (err) {
+            console.log(err);
+        }
+        res.redirect('/');
+    });
 });
 
 /* To run our application we need to listen to a port */

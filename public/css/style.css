@@ -1,0 +1,19 @@
+.border-right{
+    border-right: 2px solid red;
+    height:500px;
+    width:500px;
+}
+
+h1{
+    margin-top: 15px;
+    text-align: center; 
+    font-family: Arial, Helvetica, sans-serif
+}
+a{
+    color: #000;
+}
+
+a:hover{
+    text-decoration: none;
+}
+
