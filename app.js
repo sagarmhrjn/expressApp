@@ -139,7 +139,7 @@ app.post('/user/edit/:id', function (req, res) {
 
 /* DELETE route */
 app.delete('/users/delete/:id', function (req, res) {
-    console.log(req.params.id);
+    // console.log(req.params.id);
     db.users.remove({ _id: ObjectId(req.params.id) }, function (err, result) {
         if (err) {
             console.log(err);
